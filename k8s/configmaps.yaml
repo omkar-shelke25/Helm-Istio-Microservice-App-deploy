@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+  namespace: default
+data:
+  PORT: "8001"
+  MONGODB_URI: "mongodb://my-mongodb-0.my-mongodb-svc.default.svc.cluster.local:27017/user_db"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+  namespace: default
+data:
+  PORT: "8002"
+  MONGODB_URI: "mongodb://my-mongodb-0.my-mongodb-svc.default.svc.cluster.local:27017/order_db"
+  USER_SERVICE_URL: "http://user-service.default.svc.cluster.local:8001"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-config
+  namespace: default
+data:
+  PORT: "8003"
+  MONGODB_URI: "mongodb://my-mongodb-0.my-mongodb-svc.default.svc.cluster.local:27017/payment_db"
+  ORDER_SERVICE_URL: "http://order-service.default.svc.cluster.local:8002"
