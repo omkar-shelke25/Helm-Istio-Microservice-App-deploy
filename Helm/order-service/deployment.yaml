@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-microservice-deployment
+  labels:
+    app: order-microservice-app
+  annotations:
+    maintainer: "omkar.shelke25"
+    description: "Deployment for order microservice with production configurations"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-microservice-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: order-microservice-app
+      annotations:
+        maintainer: "omkar.shelke25"
+        description: "Deployment for order microservice with production configurations"
+    spec:
+      containers:
+        - name: order-microservice-app-container
+          image: omkara25/simple-microservice-app-order-service:v2.1
+          ports:
+            - containerPort: 8002
+          env:
+          - name: USER_SERVICE_URL
+            value: http://user-microservice-service.default.svc.cluster.local:8001
+          - name: MONGODB_URI
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-uri-secret
+                key: ORDER_DB_URI
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3

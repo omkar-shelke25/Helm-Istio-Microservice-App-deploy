@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from pymongo import MongoClient
+from bson import ObjectId
 import os
 import httpx
 
@@ -21,6 +22,12 @@ class OrderUpdate(BaseModel):
     product: str | None = None
     amount: float | None = None
 
+def to_object_id(id: str):
+    try:
+        return ObjectId(id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID format")
+
 # Routes
 @app.post("/orders/", response_model=dict)
 async def create_order(order: Order):
@@ -30,10 +37,10 @@ async def create_order(order: Order):
             response = await client.get(f"{os.getenv('USER_SERVICE_URL')}/users/{order.user_id}")
             if response.status_code != 200:
                 raise HTTPException(status_code=404, detail="User not found")
-        
+
         order_dict = order.dict()
         result = orders_collection.insert_one(order_dict)
-        order_dict["_id"] = str(result.inserted_id)  # Convert ObjectId to string
+        order_dict["_id"] = str(result.inserted_id)
         return order_dict
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -41,18 +48,18 @@ async def create_order(order: Order):
 @app.get("/orders/{order_id}", response_model=dict)
 async def get_order(order_id: str):
     try:
-        order = orders_collection.find_one({"_id": order_id})
+        oid = to_object_id(order_id)
+        order = orders_collection.find_one({"_id": oid})
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
-        # Fetch user details from User Service
+
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{os.getenv('USER_SERVICE_URL')}/users/{order.user_id}")
+            response = await client.get(f"{os.getenv('USER_SERVICE_URL')}/users/{order['user_id']}")
             if response.status_code != 200:
                 raise HTTPException(status_code=404, detail="User not found")
             user = response.json()
-        
-        order["_id"] = str(order["_id"])  # Convert ObjectId to string
+
+        order["_id"] = str(order["_id"])
         return {"order": order, "user": user}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -62,7 +69,7 @@ async def list_orders():
     try:
         orders = list(orders_collection.find())
         for order in orders:
-            order["_id"] = str(order["_id"])  # Convert ObjectId to string
+            order["_id"] = str(order["_id"])
         return orders
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -70,14 +77,15 @@ async def list_orders():
 @app.patch("/orders/{order_id}", response_model=dict)
 async def update_order(order_id: str, order_update: OrderUpdate):
     try:
+        oid = to_object_id(order_id)
         update_dict = {k: v for k, v in order_update.dict().items() if v is not None}
         if not update_dict:
             raise HTTPException(status_code=400, detail="No fields to update")
-        result = orders_collection.update_one({"_id": order_id}, {"$set": update_dict})
+        result = orders_collection.update_one({"_id": oid}, {"$set": update_dict})
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Order not found")
-        order = orders_collection.find_one({"_id": order_id})
-        order["_id"] = str(order["_id"])  # Convert ObjectId to string
+        order = orders_collection.find_one({"_id": oid})
+        order["_id"] = str(order["_id"])
         return order
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -85,7 +93,8 @@ async def update_order(order_id: str, order_update: OrderUpdate):
 @app.delete("/orders/{order_id}", response_model=dict)
 async def delete_order(order_id: str):
     try:
-        result = orders_collection.delete_one({"_id": order_id})
+        oid = to_object_id(order_id)
+        result = orders_collection.delete_one({"_id": oid})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Order not found")
         return {"message": "Order deleted"}

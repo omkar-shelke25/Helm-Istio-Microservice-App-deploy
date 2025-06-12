@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-microservice-deployment
+  labels:
+    app: user-microservice-app
+  annotations:
+    maintainer: "omkar.shelke25"
+    description: "Deployment for user microservice with production configurations"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-microservice-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: user-microservice-app
+      annotations:
+        maintainer: "omkar.shelke25"
+        description: "Deployment for user microservice with production configurations"
+    spec:
+      containers:
+        - name: user-microservice-app-container
+          image: omkara25/simple-microservice-app-user-service:v2
+          ports:
+            - containerPort: 8001
+          env:
+          - name: MONGODB_URI
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-uri-secret
+                key: USER_DB_URI
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
