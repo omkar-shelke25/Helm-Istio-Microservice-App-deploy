@@ -1,0 +1,59 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-pods-and-dns
+  namespace: api
+spec:
+  podSelector: {}  # Apply to all pods in the 'api' namespace
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    # 1. Allow traffic from any pod in the same namespace (inter-service communication)
+    - from:
+        - podSelector: {}
+      ports:
+        - port: 8001
+        - port: 8002
+        - port: 8003
+
+    # 2. [Optional] Allow external access for testing/debugging (REMOVE in production)
+    - from: []
+      ports:
+        - port: 8001
+        - port: 8002
+        - port: 8003
+
+  egress:
+    # 1. Allow DNS resolution (to kube-dns in any namespace)
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+
+    # 2. Allow access to MongoDB in the 'mongo' namespace
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              app: mongo
+          podSelector:
+            matchLabels:
+              app: mongodb
+      ports:
+        - port: 27017
+          protocol: TCP
+
+    # 3. Allow outbound calls to other services within the same namespace
+    - to:
+        - podSelector: {}
+      ports:
+        - port: 8001
+        - port: 8002
+        - port: 8003

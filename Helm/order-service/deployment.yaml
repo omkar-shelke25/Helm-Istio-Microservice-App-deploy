@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: order-microservice-deployment
+  namespace: api
   labels:
     app: order-microservice-app
   annotations:
@@ -32,7 +33,7 @@ spec:
             - containerPort: 8002
           env:
           - name: USER_SERVICE_URL
-            value: http://user-microservice-service.default.svc.cluster.local:8001
+            value: http://user-microservice-service.api.svc.cluster.local:8001
           - name: MONGODB_URI
             valueFrom:
               secretKeyRef:
