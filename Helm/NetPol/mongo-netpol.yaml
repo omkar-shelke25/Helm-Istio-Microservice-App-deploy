@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-mongodb
+  namespace: mongo
+spec:
+  podSelector:
+    matchLabels:
+      app: mongodb  # Target MongoDB pods
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app: api  # Ensure 'api' namespace has this label
+      ports:
+        - protocol: TCP
+          port: 27017

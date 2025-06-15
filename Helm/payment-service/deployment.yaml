@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: payment-microservice-deployment
+  namespace: api
   labels:
     app: payment-microservice-app
   annotations:
@@ -32,7 +33,7 @@ spec:
             - containerPort: 8003
           env:
           - name: ORDER_SERVICE_URL
-            value: http://order-svc.default.svc.cluster.local:8002
+            value: http://order-svc.api.svc.cluster.local:8002
           - name: MONGODB_URI
             valueFrom:
               secretKeyRef:
