@@ -4,7 +4,7 @@ metadata:
   name: user-microservice-service
   namespace: api
   labels:
-    app: user-microservice-app
+    app: user-microservice-app-svc
   annotations:
     description: "Service to expose the user microservice"
 spec:
@@ -15,3 +15,4 @@ spec:
       port: 8001
       targetPort: 8001
   type: ClusterIP
+

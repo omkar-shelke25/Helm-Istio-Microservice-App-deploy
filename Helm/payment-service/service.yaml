@@ -4,7 +4,7 @@ metadata:
   name: payment-microservice-service
   namespace: api
   labels:
-    app: payment-microservice-app
+    app: payment-microservice-app-svc
   annotations:
     description: "Service to expose the payment microservice"
 spec:

@@ -3,6 +3,10 @@ kind: Service
 metadata:
   name: order-svc
   namespace: api
+  labels:
+    app: order-microservice-app-svc
+  annotations:
+    description: "Service to expose the order microservice"
 spec:
   selector:
     app: order-microservice-app

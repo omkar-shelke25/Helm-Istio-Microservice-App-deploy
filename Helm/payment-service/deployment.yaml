@@ -9,10 +9,11 @@ metadata:
     maintainer: "omkar.shelke25"
     description: "Deployment for payment microservice with production configurations"
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: payment-microservice-app
+      version: v1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -22,6 +23,7 @@ spec:
     metadata:
       labels:
         app: payment-microservice-app
+        version: v1
       annotations:
         maintainer: "omkar.shelke25"
         description: "Deployment for payment microservice with production configurations"
