@@ -1,0 +1,10 @@
+apiVersion: v2
+name: mongodb-uri-secret
+description: Helm chart to create MongoDB connection string secrets for user, order, and payment microservices
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Omkar Shelke
+    email: omkar.shelke25@proton.me

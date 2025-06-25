@@ -1,0 +1,47 @@
+enabled: true
+namespace: api
+maintainer: "omkar.shelke25"
+
+deployment:
+  name: user-microservice-deployment
+  replicas: 1
+  labels:
+    app: user-microservice-app
+    version: v1
+  description: "Deployment for user microservice with production configurations"
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  container:
+    name: user-microservice-app-container
+    image: omkara25/simple-microservice-app-user-service
+    tag: v2
+    port: 8001
+    env:
+      mongodbSecretName: mongodb-uri-secret
+      mongodbSecretKey: USER_DB_URI
+    readinessProbe:
+      path: /health
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 10
+      failureThreshold: 3
+    livenessProbe:
+      path: /health
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 10
+      failureThreshold: 3
+
+service:
+  name: user-microservice-service
+  labels:
+    app: user-microservice-app-svc
+  description: "Service to expose the user microservice"
+  type: ClusterIP
+  ports:
+    protocol: TCP
+    port: 8001
+    targetPort: 8001

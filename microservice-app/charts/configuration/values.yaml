@@ -1,0 +1,9 @@
+enabled: true
+
+namespace: api
+
+secret:
+  name: mongodb-uri-secret
+  userUri: mongodb://admin:password@mongodb.mongo.svc.cluster.local:27017/user_db?authSource=admin
+  orderUri: mongodb://admin:password@mongodb.mongo.svc.cluster.local:27017/order_db?authSource=admin
+  paymentUri: mongodb://admin:password@mongodb.mongo.svc.cluster.local:27017/payment_db?authSource=admin

@@ -1,0 +1,40 @@
+{{- if .Values.enabled }}
+{{- with .Values }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .service.name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .labels.app }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .labels.app }}
+      version: {{ .labels.version }}
+  template:
+    metadata:
+      labels:
+        app: {{ .labels.app }}
+        version: {{ .labels.version }}
+    spec:
+      containers:
+        - name: {{ .labels.app }}
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          ports:
+            - containerPort: {{ .service.port }}
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: {{ .auth.username | quote }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: {{ .auth.password | quote }}
+          volumeMounts:
+            - name: mongo-data
+              mountPath: {{ .storage.mountPath }}
+      volumes:
+        - name: mongo-data
+          emptyDir: {}
+{{- end }}
+{{- end }}
