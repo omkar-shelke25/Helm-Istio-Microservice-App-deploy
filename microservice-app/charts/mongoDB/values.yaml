@@ -1,0 +1,28 @@
+enabled: true
+
+replicaCount: 1
+
+namespace: mongo
+
+image:
+  repository: mongo
+  tag: "7.0"
+  pullPolicy: IfNotPresent
+
+service:
+  name: mongodb
+  port: 27017
+  type: ClusterIP
+  annotations:
+    description: "Service to expose the MongoDB deployment"
+
+auth:
+  username: admin
+  password: password
+
+storage:
+  mountPath: /data/db
+
+labels:
+  app: mongodb
+  version: v1

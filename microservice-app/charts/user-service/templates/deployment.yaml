@@ -1,0 +1,60 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.deployment.labels.app }}
+  annotations:
+    maintainer: {{ .Values.maintainer }}
+    description: {{ .Values.deployment.description }}
+spec:
+  {{- with .Values.deployment }}
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ .labels.app }}
+      version: {{ .labels.version }}
+  strategy:
+    type: {{ .strategy.type }}
+    rollingUpdate:
+      maxSurge: {{ .strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .strategy.rollingUpdate.maxUnavailable }}
+  template:
+    metadata:
+      labels:
+        app: {{ .labels.app }}
+        version: {{ .labels.version }}
+      annotations:
+        maintainer: {{ $.Values.maintainer }}
+        description: {{ .description }}
+    spec:
+      containers:
+        - name: {{ .container.name }}
+          image: {{ .container.image }}:{{ .container.tag }}
+          ports:
+            - containerPort: {{ .container.port }}
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .container.env.mongodbSecretName }}
+                  key: {{ .container.env.mongodbSecretKey }}
+          readinessProbe:
+            httpGet:
+              path: {{ .container.readinessProbe.path }}
+              port: {{ .container.port }}
+            initialDelaySeconds: {{ .container.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .container.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .container.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .container.readinessProbe.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .container.livenessProbe.path }}
+              port: {{ .container.port }}
+            initialDelaySeconds: {{ .container.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .container.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .container.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .container.livenessProbe.failureThreshold }}
+  {{- end }}
