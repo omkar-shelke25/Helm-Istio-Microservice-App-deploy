@@ -14,7 +14,7 @@ dependencies:
   - name: mongodb
     version: 1.0.0
     repository: file://charts/mongoDB
-  - name: user-microservice-app
+  - name: user-microservice
     version: 1.0.0
     repository: file://charts/user-service
   - name: order-microservice-app
