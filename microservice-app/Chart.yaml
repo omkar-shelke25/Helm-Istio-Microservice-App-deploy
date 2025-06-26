@@ -17,6 +17,13 @@ dependencies:
   - name: user-microservice-app
     version: 1.0.0
     repository: file://charts/user-service
+  - name: order-microservice-app
+    version: 1.0.0
+    repository: file://charts/order-service
+  - name: payment-microservice-app
+    version: 1.0.0
+    repository: file://charts/payment-service
+    
 
 maintainers:
   - name: Omkar Shelke
