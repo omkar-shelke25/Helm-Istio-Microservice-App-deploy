@@ -36,6 +36,8 @@ spec:
           ports:
             - containerPort: {{ .container.port }}
           env:
+            - name: ORDER_SERVICE_URL
+              value: {{ .container.env.orderServiceUrl }}
             - name: MONGODB_URI
               valueFrom:
                 secretKeyRef:
