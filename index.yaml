@@ -3,7 +3,7 @@ entries:
   fastapi-microservice-app:
   - apiVersion: v2
     appVersion: 1.2.0
-    created: "2025-07-05T17:39:47.789702067Z"
+    created: "2025-07-05T18:17:21.614971599Z"
     dependencies:
     - name: mongodb-uri-secret
       repository: file://charts/configuration
@@ -22,7 +22,7 @@ entries:
       version: 1.0.0
     description: 'Helm chart to deploy a Python FastAPI microservice-based application  on
       Kubernetes, enabling scalable, maintainable, and modular architecture. '
-    digest: cbe1123c576c6231fcc6f9adf6fe9d76abd5fdd5f55c442c1c33fca3c83d9775
+    digest: 08b3afdc6c2bfef3f51b05da0e5641c866e9412a3e2e1e020bd36fc3448a9f48
     maintainers:
     - email: omkar.shelke25@proton.me
       name: Omkar Shelke
@@ -33,7 +33,7 @@ entries:
     version: 1.2.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-07-05T17:39:47.788570537Z"
+    created: "2025-07-05T18:17:21.613908006Z"
     dependencies:
     - name: mongodb-uri-secret
       repository: file://charts/configuration
@@ -61,4 +61,4 @@ entries:
     urls:
     - https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy/fastapi-microservice-app-1.0.0.tgz
     version: 1.0.0
-generated: "2025-07-05T17:39:47.786761315Z"
+generated: "2025-07-05T18:17:21.612734889Z"
