@@ -1,0 +1,27 @@
+
+{{- if .Values.services.order.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: virtualservice-order-microservice
+  namespace: {{ .Values.global.apiNamespace }}
+spec:
+  hosts:
+    - {{ .Values.global.gatewayHost }}
+  gateways:
+    - microservice-gateway
+  http:
+    - name: {{ .Values.services.order.name }}-virtual-service
+      match:
+        {{- range .Values.services.order.uriPrefixes }}
+        - uri:
+            prefix: {{ . }}
+        {{- end }}
+      route:
+        - destination:
+            host: {{ .Values.services.order.serviceHost }}
+            subset: {{ .Values.services.order.subset }}
+            port:
+              number: {{ .Values.services.order.port }}
+          weight: 100
+{{- end }}

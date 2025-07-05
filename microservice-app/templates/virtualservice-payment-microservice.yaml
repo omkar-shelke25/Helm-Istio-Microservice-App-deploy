@@ -1,0 +1,26 @@
+{{- if .Values.services.payment.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: virtualservice-payment-microservice
+  namespace: {{ .Values.global.apiNamespace }}
+spec:
+  hosts:
+    - {{ .Values.global.gatewayHost }}
+  gateways:
+    - microservice-gateway
+  http:
+    - name: {{ .Values.services.payment.name }}-virtual-service
+      match:
+        {{- range .Values.services.payment.uriPrefixes }}
+        - uri:
+            prefix: {{ . }}
+        {{- end }}
+      route:
+        - destination:
+            host: {{ .Values.services.payment.serviceHost }}
+            subset: {{ .Values.services.payment.subset }}
+            port:
+              number: {{ .Values.services.payment.port }}
+          weight: 100
+{{- end }}
