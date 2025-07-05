@@ -1,0 +1,12 @@
+{{- if .Values.peerauth.api.enabled }}
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: api-peerauth
+  namespace: {{ .Values.global.apiNamespace }}
+spec:
+  {{- with .Values.peerauth.api }}
+  mtls:
+    mode: {{ .mtlsMode }}
+  {{- end }}
+{{- end }}
