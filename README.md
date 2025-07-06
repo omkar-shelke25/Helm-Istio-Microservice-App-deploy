@@ -41,7 +41,8 @@ The application leverages a microservice architecture where:
 - **Istio** manages service-to-service communication, ensuring secure and observable interactions.
 
 The Kiali console visualizes these interactions, showing traffic flow between services and MongoDB:
-![Kiali Console Output](https://github.com/user-attachments/assets/03349aa4-cf31-4d07-a378-94fd4e7a36c7)
+![image](https://github.com/user-attachments/assets/b49f3f98-43fb-4afe-b580-218daf9d2087)
+
 
 ## ✅ Prerequisites
 
