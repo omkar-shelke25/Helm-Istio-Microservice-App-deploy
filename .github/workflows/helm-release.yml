@@ -1,0 +1,54 @@
+name: Helm Chart Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'microservice-app/**'
+      - '*.tgz'
+
+jobs:
+  helm-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Create repo directory if missing
+        run: mkdir -p repo
+
+      - name: Move new packages to repo/
+        run: |
+          cp fastapi-microservice-app-*.tgz repo/
+
+      - name: Update index.yaml
+        run: |
+          helm repo index repo --url https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy \
+            --merge index.yaml
+          cp repo/index.yaml .
+
+      - name: Commit and Push Helm chart + index.yaml
+        run: |
+          git add index.yaml
+          git add *.tgz
+          git commit -m "📦 Helm chart release: automated update"
+          git push origin main
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GIT_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
