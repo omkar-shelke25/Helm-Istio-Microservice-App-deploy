@@ -1,46 +1,46 @@
 # Microservice Application with Helm, Istio, and Kubernetes
 
-This repository contains a microservice-based application consisting of three services: `order-service`, `payment-service`, and `user-service`. Each service is containerized using Docker and deployed on a Kubernetes cluster using Helm for package management and Istio for service mesh capabilities, including traffic management, observability, and security.
+Welcome to the **Microservice Application**, a modern, cloud-native system featuring three interconnected services: `order-service`, `payment-service`, and `user-service`. Built with **FastAPI**, containerized using **Docker**, and deployed on **Kubernetes** with **Helm** for package management and **Istio** for service mesh capabilities, this application demonstrates scalable microservice architecture with advanced traffic management, observability, and security.
 
 ## Repository Structure
 
-- `deployment.sh`: Bash script to install Helm, deploy Istio, configure namespaces, and deploy the microservices.
-- `fastapi-microservice-app-1.0.0.tgz`: Helm chart version 1.0.0 (initial release).
-- `fastapi-microservice-app-1.2.0.tgz`: Helm chart version 1.2.0 (minor updates).
-- `fastapi-microservice-app-1.3.0.tgz`: Helm chart version 1.3.0 (latest patch).
+- `deployment.sh`: Automates Helm/Istio installation, namespace setup, and microservice deployment.
+- `fastapi-microservice-app-*.tgz`: Helm chart versions (`1.0.0`, `1.2.0`, `1.3.0` - latest).
 - `index.yaml`: Helm chart repository index.
-- `microservice-app/`: Unpacked Helm chart directory for the microservices.
-- `notes.md`: Notes on setup, security, and networking configurations.
-- `src/`: Source code for `order-service`, `payment-service`, and `user-service` (FastAPI-based).
-- `Dockerfile` (per service): Docker configuration for containerizing each microservice.
+- `microservice-app/`: Unpacked Helm chart for microservices.
+- `notes.md`: Detailed setup, security, and networking notes.
+- `src/`: Source code for `order-service`, `payment-service`, and `user-service`.
+- `Dockerfile` (per service): Docker configurations for containerizing microservices.
 
 ## Microservices Overview
 
 1. **Order Service**:
-   - Manages order creation, retrieval, and updates.
-   - Interacts with `payment-service` for payment processing and `user-service` for user validation.
-   - Exposed via RESTful APIs.
+   - **Function**: Manages order creation, retrieval, and updates.
+   - **Interactions**: Communicates with `payment-service` for payment processing and `user-service` for user validation.
+   - **API**: RESTful endpoints (e.g., `/orders`).
 
 2. **Payment Service**:
-   - Handles payment processing and transaction status.
-   - Communicates with external payment gateways (mocked for demo purposes).
-   - Integrates with `order-service` for payment confirmation.
+   - **Function**: Processes payments and tracks transaction status (mocked for demo purposes).
+   - **Interactions**: Confirms payments with `order-service`.
+   - **API**: RESTful endpoints (e.g., `/payments`).
 
 3. **User Service**:
-   - Manages user profiles, authentication, and authorization.
-   - Provides user data to `order-service` for order validation.
+   - **Function**: Manages user profiles, authentication, and authorization.
+   - **Interactions**: Provides user data to `order-service`.
+   - **API**: RESTful endpoints (e.g., `/users`).
 
-Each service is built with **FastAPI**, containerized using **Docker**, and deployed as a Kubernetes pod managed by Helm charts.
+Each service is built with **FastAPI**, containerized with **Docker**, and deployed as Kubernetes pods managed by Helm charts.
 
 ## Prerequisites
 
-- **Kubernetes Cluster**: A running cluster (e.g., Minikube, Kind, EKS, GKE, or AKS).
-- **kubectl**: Installed and configured to interact with your cluster.
+Ensure the following are set up before deployment:
+- A running **Kubernetes cluster** (e.g., Minikube, Kind, EKS, GKE, AKS).
+- **kubectl**: Installed and configured to access your cluster.
 - **Docker**: For building and pushing container images.
-- **Helm**: For deploying the application (installed by `deployment.sh` if not present).
-- **Istio**: For service mesh features (installed by `deployment.sh`).
+- **Helm**: Installed (or installed automatically by `deployment.sh`).
+- **Istio**: Installed via `deployment.sh` for service mesh features.
 - **sudo**: Required for modifying `/etc/hosts` for DNS configuration.
-- **Internet Access**: To download Helm, Istio, and the Helm chart repository.
+- **Internet Access**: To download Helm, Istio, and Helm chart dependencies.
 
 ## Deployment Instructions
 
@@ -63,81 +63,106 @@ The `deployment.sh` script automates the setup and deployment process. Follow th
    ```
 
 ### What the Script Does
-
-1. **Installs Helm**:
-   - Downloads and installs Helm using the official script.
-   - Verifies installation with `helm version`.
-
-2. **Installs Istio**:
-   - Deploys Istio with the `demo` profile using `istioctl`.
-   - Enables service mesh features like traffic management and observability.
-
-3. **Creates Kubernetes Namespaces**:
-   - Creates `mongo` and `api` namespaces (if they don't exist).
-   - Enables Istio sidecar injection for both namespaces.
-
-4. **Configures DNS**:
-   - Maps `microservice-gateway.k8s.dns` to the `istio-ingressgateway` ClusterIP in `/etc/hosts`.
-   - Verifies the DNS entry.
-
-5. **Deploys the Microservices**:
-   - Adds the Helm chart repository: `https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy/`.
-   - Installs the microservices using the Helm chart version 1.3.0.
-   - Deploys `order-service`, `payment-service`, and `user-service` as Kubernetes workloads.
+- **Installs Helm**: Downloads and verifies Helm installation.
+- **Installs Istio**: Deploys Istio with the `demo` profile for service mesh features like traffic management and observability.
+- **Creates Namespaces**: Sets up `mongo` and `api` namespaces with Istio sidecar injection enabled.
+- **Configures DNS**: Maps `microservice-gateway.k8s.dns` to the Istio ingress gateway's ClusterIP in `/etc/hosts`.
+- **Deploys Microservices**: Adds the Helm chart repository (`https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy/`) and installs version `1.3.0` of the microservices.
 
 ## Accessing the Application
 
-- Access the microservices via the Istio ingress gateway at `microservice-gateway.k8s.dns`.
-- Ensure `/etc/hosts` contains the mapping to the `istio-ingressgateway` ClusterIP.
-- Example endpoints (depending on configuration):
-  - `order-service`: `http://microservice-gateway.k8s.dns/orders`
-  - `payment-service`: `http://microservice-gateway.k8s.dns/payments`
-  - `user-service`: `http://microservice-gateway.k8s.dns/users`
+- **Base URL**: `http://microservice-gateway.k8s.dns`
+- **Endpoints**:
+  - `order-service`: `/orders`
+  - `payment-service`: `/payments`
+  - `user-service`: `/users`
+- **DNS Requirement**: Ensure `/etc/hosts` includes the mapping for `microservice-gateway.k8s.dns` to the `istio-ingressgateway` ClusterIP.
+
+### Example API Calls
+
+Below are example API calls with their expected outputs, as demonstrated in the provided screenshots.
+
+1. **Create a User**:
+   ```bash
+   curl -X POST http://microservice-gateway.k8s.dns/users/ \
+   -H "Content-Type: application/json" \
+   -d '{"name":"John Doe","email":"john@example.com"}' | jq
+   ```
+   ```bash
+   curl -X POST http://microservice-gateway.k8s.dns/users/ \
+   -H "Content-Type: application/json" \
+   -d '{"name":"Omkar","email":"shelke"}' | jq
+   ```
+   *Output*: Creates users and stores them in MongoDB.
+   ![User Creation Output](https://github.com/user-attachments/assets/63a021d9-8943-41d8-b975-971f1ef86fdc)
+
+2. **List Users**:
+   ```bash
+   curl -X GET http://microservice-gateway.k8s.dns/users/ | jq
+   ```
+   *Output*: Displays a list of created users.
+   ![User List Output](https://github.com/user-attachments/assets/4d769f5b-72e1-4269-a609-0f3ecfaed1fa)
+
+3. **Create an Order** (requires `user_id` from user service):
+   ```bash
+   curl -X POST http://microservice-gateway.k8s.dns/orders/ \
+   -H "Content-Type: application/json" \
+   -d '{"user_id":"686aa16b1858e2c497a1cd93","product":"Laptop","amount":999.99}' | jq
+   ```
+   *Output*: Creates an order linked to a user.
+   ![Order Creation Output](https://github.com/user-attachments/assets/ca4b4d37-eaee-4c46-9a45-a1b0b789d6fc)
+
+4. **List Orders**:
+   ```bash
+   curl -X GET http://microservice-gateway.k8s.dns/orders/ | jq
+   ```
+   *Output*: Shows orders associated with user IDs.
+   ![Order List Output](https://github.com/user-attachments/assets/545f0dd0-b852-4d00-bbdf-729a8404a8ec)
+
+5. **Process a Payment** (requires `order_id` from order service):
+   ```bash
+   curl -X POST http://microservice-gateway.k8s.dns/payments/ \
+   -H "Content-Type: application/json" \
+   -d '{"order_id":"686aa21c9fb5eb202be21db8","amount":999.99,"status":"successful"}' | jq
+   ```
+   *Output*: Confirms payment for an order.
+   ![Payment Creation Output](https://github.com/user-attachments/assets/afb43e81-366c-4411-ac8c-9b67438d69ca)
+
+6. **List Payments**:
+   ```bash
+   curl -X GET http://microservice-gateway.k8s.dns/payments/ | jq
+   ```
+   *Output*: Displays payment records.
+   ![Payment List Output](https://github.com/user-attachments/assets/b27c415a-d3c9-4feb-b35e-997588d6e677)
 
 ## Istio Features
 
-- **Traffic Management**: Uses Istio's VirtualService and DestinationRule for routing and load balancing.
-- **Observability**: Integrates with Istio for metrics, logs, and tracing (e.g., via Kiali or Prometheus).
-- **Security**: Enforces mutual TLS (mTLS) for service-to-service communication.
+- **Traffic Management**: Leverages `VirtualService` and `DestinationRule` for intelligent routing and load balancing.
+- **Observability**: Integrates with Kiali, Prometheus, or Jaeger for metrics, logs, and tracing.
+- **Security**: Enforces mutual TLS (mTLS) for secure service-to-service communication.
 
-## Building and Pushing Docker Images
-
-Each microservice has its own `Dockerfile` in the `src/` directory. To build and push images:
-
-1. **Build Docker Images**:
-   ```bash
-   cd src/order-service
-   docker build -t <your-registry>/order-service:latest .
-   cd ../payment-service
-   docker build -t <your-registry>/payment-service:latest .
-   cd ../user-service
-   docker build -t <your-registry>/user-service:latest .
-   ```
-
-2. **Push to Registry**:
-   ```bash
-   docker push <your-registry>/order-service:latest
-   docker push <your-registry>/payment-service:latest
-   docker push <your-registry>/user-service:latest
-   ```
-
-3. Update the Helm chart (`microservice-app/values.yaml`) with your image repository details before running `deployment.sh`.
-
-## Notes
-
-- Refer to `notes.md` for additional setup, security, and networking details.
-- Ensure `kubectl` is configured to access your Kubernetes cluster.
-- The script requires `sudo` privileges to modify `/etc/hosts`.
-- Customize Helm chart values (e.g., `microservice-app/values.yaml`) for specific configurations like resource limits or replicas.
 
 ## Troubleshooting
 
-- **kubectl not found**: Install `kubectl` and add it to your PATH.
-- **DNS mapping failure**: Verify `sudo` permissions and check `/etc/hosts`.
-- **Helm chart issues**: Ensure the Helm repository is accessible and the chart version is correct.
-- **Istio issues**: Verify the `istio-system` namespace and `istio-ingressgateway` service.
-- **Pod failures**: Check pod logs with `kubectl logs <pod-name> -n api`.
+- **kubectl Issues**: Ensure `kubectl` is installed and configured (`kubectl config view`).
+- **DNS Errors**: Verify `/etc/hosts` entries and `sudo` permissions.
+- **Helm Failures**: Check repository accessibility (`helm repo list`) and chart version.
+- **Istio Issues**: Inspect the `istio-system` namespace (`kubectl get pods -n istio-system`).
+- **Pod Failures**: Check logs with `kubectl logs <pod-name> -n api`.
+- **MongoDB Issues**: Verify the `mongo` namespace and pod status (`kubectl get pods -n mongo`).
 
 ## Contributing
 
-Contributions are welcome! Please submit a pull request or open an issue for enhancements, bug fixes, or documentation improvements.
+Contributions are welcome! To contribute:
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature-name`).
+3. Commit your changes (`git commit -m "Description"`).
+4. Submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+
+
+
