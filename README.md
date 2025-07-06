@@ -1,118 +1,143 @@
-# MicroDeploy-HelmIstio
+# Microservice Application with Helm, Istio, and Kubernetes
 
-## Description
-This repository contains a microservice-based application deployed on Kubernetes using Helm and Istio. The project includes three microservices: `order-service`, `payment-service`, and `user-service`. Each service is containerized with Docker and managed within a Kubernetes cluster, leveraging Istio for service mesh capabilities like traffic management, observability, and security.
+This repository contains a microservice-based application consisting of three services: `order-service`, `payment-service`, and `user-service`. Each service is containerized using Docker and deployed on a Kubernetes cluster using Helm for package management and Istio for service mesh capabilities, including traffic management, observability, and security.
 
-## Project Structure
-```
-MicroDeploy-HelmIstio/
-├── order-service/
-│   ├── Dockerfile
-│   ├── main.py
-│   ├── requirements.txt
-├── payment-service/
-│   ├── Dockerfile
-│   ├── main.py
-│   ├── requirements.txt
-├── user-service/
-│   ├── Dockerfile
-│   ├── main.py
-│   ├── requirements.txt
-├── charts/
-│   ├── order-service/
-│   ├── payment-service/
-│   ├── user-service/
-│   ├── istio-config/
-└── README.md
-```
+## Repository Structure
 
-- **`order-service/`**: Contains the Order Service microservice with its Dockerfile, main application code (`main.py`), and Python dependencies (`requirements.txt`).
-- **`payment-service/`**: Contains the Payment Service microservice with its Dockerfile, main application code (`main.py`), and Python dependencies (`requirements.txt`).
-- **`user-service/`**: Contains the User Service microservice with its Dockerfile, main application code (`main.py`), and Python dependencies (`requirements.txt`).
-- **`charts/`**: Contains Helm charts for deploying each microservice and Istio configurations (e.g., VirtualServices, DestinationRules).
+- `deployment.sh`: Bash script to install Helm, deploy Istio, configure namespaces, and deploy the microservices.
+- `fastapi-microservice-app-1.0.0.tgz`: Helm chart version 1.0.0 (initial release).
+- `fastapi-microservice-app-1.2.0.tgz`: Helm chart version 1.2.0 (minor updates).
+- `fastapi-microservice-app-1.3.0.tgz`: Helm chart version 1.3.0 (latest patch).
+- `index.yaml`: Helm chart repository index.
+- `microservice-app/`: Unpacked Helm chart directory for the microservices.
+- `notes.md`: Notes on setup, security, and networking configurations.
+- `src/`: Source code for `order-service`, `payment-service`, and `user-service` (FastAPI-based).
+- `Dockerfile` (per service): Docker configuration for containerizing each microservice.
+
+## Microservices Overview
+
+1. **Order Service**:
+   - Manages order creation, retrieval, and updates.
+   - Interacts with `payment-service` for payment processing and `user-service` for user validation.
+   - Exposed via RESTful APIs.
+
+2. **Payment Service**:
+   - Handles payment processing and transaction status.
+   - Communicates with external payment gateways (mocked for demo purposes).
+   - Integrates with `order-service` for payment confirmation.
+
+3. **User Service**:
+   - Manages user profiles, authentication, and authorization.
+   - Provides user data to `order-service` for order validation.
+
+Each service is built with **FastAPI**, containerized using **Docker**, and deployed as a Kubernetes pod managed by Helm charts.
 
 ## Prerequisites
-- Docker: For building container images.
-- Kubernetes: A running cluster (e.g., Minikube, Kind, or a cloud provider like GKE/EKS/AKS).
-- Helm: For deploying the microservices and Istio.
-- Istio: For service mesh features (installed via Helm).
-- kubectl: For interacting with the Kubernetes cluster.
 
-## Setup Instructions
+- **Kubernetes Cluster**: A running cluster (e.g., Minikube, Kind, EKS, GKE, or AKS).
+- **kubectl**: Installed and configured to interact with your cluster.
+- **Docker**: For building and pushing container images.
+- **Helm**: For deploying the application (installed by `deployment.sh` if not present).
+- **Istio**: For service mesh features (installed by `deployment.sh`).
+- **sudo**: Required for modifying `/etc/hosts` for DNS configuration.
+- **Internet Access**: To download Helm, Istio, and the Helm chart repository.
 
-1. **Clone the Repository**
+## Deployment Instructions
+
+The `deployment.sh` script automates the setup and deployment process. Follow these steps:
+
+1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/MicroDeploy-HelmIstio.git
-   cd MicroDeploy-HelmIstio
+   git clone <repository-url>
+   cd <repository-directory>
    ```
 
-2. **Build Docker Images**
-   For each service (`order-service`, `payment-service`, `user-service`), build the Docker images:
+2. **Make the Script Executable**:
    ```bash
-   docker build -t your-username/order-service:latest ./order-service
-   docker build -t your-username/payment-service:latest ./payment-service
-   docker build -t your-username/user-service:latest ./user-service
+   chmod +x deployment.sh
    ```
 
-3. **Push Images to a Container Registry**
-   Push the images to a registry (e.g., Docker Hub):
+3. **Run the Deployment Script**:
    ```bash
-   docker push your-username/order-service:latest
-   docker push your-username/payment-service:latest
-   docker push your-username/user-service:latest
+   ./deployment.sh
    ```
 
-4. **Install Istio**
-   Install Istio using Helm:
-   ```bash
-   helm repo add istio https://istio-release.storage.googleapis.com/charts
-   helm install istio-base istio/base -n istio-system --create-namespace
-   helm install istiod istio/istiod -n istio-system --wait
-   helm install istio-ingress istio/gateway -n istio-ingress --create-namespace
-   ```
+### What the Script Does
 
-5. **Enable Istio Injection**
-   Enable automatic Istio sidecar injection for the namespace where microservices will be deployed:
-   ```bash
-   kubectl create namespace microservices
-   kubectl label namespace microservices istio-injection=enabled
-   ```
+1. **Installs Helm**:
+   - Downloads and installs Helm using the official script.
+   - Verifies installation with `helm version`.
 
-6. **Deploy Microservices with Helm**
-   Deploy each microservice using the Helm charts in the `charts/` directory:
-   ```bash
-   helm install order-service ./charts/order-service -n microservices
-   helm install payment-service ./charts/payment-service -n microservices
-   helm install user-service ./charts/user-service -n microservices
-   ```
+2. **Installs Istio**:
+   - Deploys Istio with the `demo` profile using `istioctl`.
+   - Enables service mesh features like traffic management and observability.
 
-7. **Apply Istio Configurations**
-   Apply Istio resources (e.g., VirtualServices, DestinationRules) for traffic management:
-   ```bash
-   kubectl apply -f charts/istio-config -n microservices
-   ```
+3. **Creates Kubernetes Namespaces**:
+   - Creates `mongo` and `api` namespaces (if they don't exist).
+   - Enables Istio sidecar injection for both namespaces.
 
-8. **Verify Deployment**
-   Check the status of the deployed services:
-   ```bash
-   kubectl get pods -n microservices
-   kubectl get svc -n microservices
-   ```
+4. **Configures DNS**:
+   - Maps `microservice-gateway.k8s.dns` to the `istio-ingressgateway` ClusterIP in `/etc/hosts`.
+   - Verifies the DNS entry.
 
-9. **Access the Application**
-   Access the application via the Istio ingress gateway:
-   ```bash
-   export INGRESS_HOST=$(kubectl -n istio-ingress get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-   curl http://$INGRESS_HOST/order
-   ```
+5. **Deploys the Microservices**:
+   - Adds the Helm chart repository: `https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy/`.
+   - Installs the microservices using the Helm chart version 1.3.0.
+   - Deploys `order-service`, `payment-service`, and `user-service` as Kubernetes workloads.
+
+## Accessing the Application
+
+- Access the microservices via the Istio ingress gateway at `microservice-gateway.k8s.dns`.
+- Ensure `/etc/hosts` contains the mapping to the `istio-ingressgateway` ClusterIP.
+- Example endpoints (depending on configuration):
+  - `order-service`: `http://microservice-gateway.k8s.dns/orders`
+  - `payment-service`: `http://microservice-gateway.k8s.dns/payments`
+  - `user-service`: `http://microservice-gateway.k8s.dns/users`
 
 ## Istio Features
-- **Traffic Management**: Uses VirtualServices and DestinationRules to route traffic between `order-service`, `payment-service`, and `user-service`.
-- **Observability**: Integrates with Kiali, Prometheus, and Jaeger for monitoring (configured via Helm charts).
-- **Security**: Enforces mTLS between services for secure communication.
+
+- **Traffic Management**: Uses Istio's VirtualService and DestinationRule for routing and load balancing.
+- **Observability**: Integrates with Istio for metrics, logs, and tracing (e.g., via Kiali or Prometheus).
+- **Security**: Enforces mutual TLS (mTLS) for service-to-service communication.
+
+## Building and Pushing Docker Images
+
+Each microservice has its own `Dockerfile` in the `src/` directory. To build and push images:
+
+1. **Build Docker Images**:
+   ```bash
+   cd src/order-service
+   docker build -t <your-registry>/order-service:latest .
+   cd ../payment-service
+   docker build -t <your-registry>/payment-service:latest .
+   cd ../user-service
+   docker build -t <your-registry>/user-service:latest .
+   ```
+
+2. **Push to Registry**:
+   ```bash
+   docker push <your-registry>/order-service:latest
+   docker push <your-registry>/payment-service:latest
+   docker push <your-registry>/user-service:latest
+   ```
+
+3. Update the Helm chart (`microservice-app/values.yaml`) with your image repository details before running `deployment.sh`.
+
+## Notes
+
+- Refer to `notes.md` for additional setup, security, and networking details.
+- Ensure `kubectl` is configured to access your Kubernetes cluster.
+- The script requires `sudo` privileges to modify `/etc/hosts`.
+- Customize Helm chart values (e.g., `microservice-app/values.yaml`) for specific configurations like resource limits or replicas.
+
+## Troubleshooting
+
+- **kubectl not found**: Install `kubectl` and add it to your PATH.
+- **DNS mapping failure**: Verify `sudo` permissions and check `/etc/hosts`.
+- **Helm chart issues**: Ensure the Helm repository is accessible and the chart version is correct.
+- **Istio issues**: Verify the `istio-system` namespace and `istio-ingressgateway` service.
+- **Pod failures**: Check pod logs with `kubectl logs <pod-name> -n api`.
 
 ## Contributing
-Contributions are welcome! Please submit a pull request or open an issue for any improvements or bug fixes.
 
-## License
-This project is licensed under the MIT License.
+Contributions are welcome! Please submit a pull request or open an issue for enhancements, bug fixes, or documentation improvements.
