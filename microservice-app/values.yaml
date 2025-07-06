@@ -27,7 +27,7 @@ services:
     serviceHost: user-microservice-service.api.svc.cluster.local
     port: 8001
     uriPrefixes:
-      - /user
+      - /users
       - /health
     subset: v1
     versionLabel: v1
