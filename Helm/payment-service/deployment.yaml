@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-microservice-deployment
+  namespace: api
+  labels:
+    app: payment-microservice-app
+  annotations:
+    maintainer: "omkar.shelke25"
+    description: "Deployment for payment microservice with production configurations"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-microservice-app
+      version: v1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: payment-microservice-app
+        version: v1
+      annotations:
+        maintainer: "omkar.shelke25"
+        description: "Deployment for payment microservice with production configurations"
+    spec:
+      containers:
+        - name: payment-microservice-app-container
+          image: omkara25/simple-microservice-app-payment-service:v2
+          ports:
+            - containerPort: 8003
+          env:
+          - name: ORDER_SERVICE_URL
+            value: http://order-svc.api.svc.cluster.local:8002
+          - name: MONGODB_URI
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-uri-secret
+                key: PAYMENT_DB_URI
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3

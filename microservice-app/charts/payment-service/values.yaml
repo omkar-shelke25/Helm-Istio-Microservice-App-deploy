@@ -1,0 +1,48 @@
+enabled: true
+namespace: api
+maintainer: "omkar.shelke25"
+
+deployment:
+  name: payment-microservice-deployment
+  replicas: 1
+  labels:
+    app: payment-microservice-app
+    version: v1
+  description: "Deployment for payment microservice with production configurations"
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  container:
+    name: payment-microservice-app-container
+    image: omkara25/simple-microservice-app-payment-service
+    tag: v2
+    port: 8003
+    env:
+      orderServiceUrl: "http://order-svc.api.svc.cluster.local:8002"
+      mongodbSecretName: mongodb-uri-secret
+      mongodbSecretKey: PAYMENT_DB_URI
+    readinessProbe:
+      path: /health
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 10
+      failureThreshold: 3
+    livenessProbe:
+      path: /health
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 10
+      failureThreshold: 3
+
+service:
+  name: payment-microservice-service
+  labels:
+    app: payment-microservice-app-svc
+  description: "Service to expose the payment microservice"
+  type: ClusterIP
+  ports:
+    protocol: TCP
+    port: 8003
+    targetPort: 8003

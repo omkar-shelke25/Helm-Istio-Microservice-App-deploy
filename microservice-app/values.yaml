@@ -1,0 +1,58 @@
+global:
+  apiNamespace: api
+  mongoNamespace: mongo
+  gatewayHost: microservice-gateway.k8s.dns
+  ingressGatewaySelector:
+    istio: ingressgateway  
+
+peerauth:
+  api:
+    enabled: true
+    mtlsMode: STRICT
+  mongo:
+    enabled: true
+    mtlsMode: STRICT
+
+gateway:
+  enabled: true
+  port: 80
+  protocol: HTTP
+  hosts:
+    - "*"
+
+services:
+  user:
+    enabled: true
+    name: user-microservice
+    serviceHost: user-microservice-service.api.svc.cluster.local
+    port: 8001
+    uriPrefixes:
+      - /users
+      - /health
+    subset: v1
+    versionLabel: v1
+    loadBalancer: LEAST_REQUEST
+
+  order:
+    enabled: true
+    name: order-microservice
+    serviceHost: order-svc.api.svc.cluster.local
+    port: 8002
+    uriPrefixes:
+      - /orders
+      - /health
+    subset: v1
+    versionLabel: v1
+    loadBalancer: LEAST_REQUEST
+
+  payment:
+    enabled: true
+    name: payment-microservice
+    serviceHost: payment-microservice-service.api.svc.cluster.local
+    port: 8003
+    uriPrefixes:
+      - /payments
+      - /health
+    subset: v1
+    versionLabel: v1
+    loadBalancer: LEAST_REQUEST

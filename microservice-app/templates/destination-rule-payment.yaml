@@ -1,0 +1,16 @@
+{{- if .Values.services.payment.enabled }}
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: payment-destination-rule
+  namespace: {{ .Values.global.apiNamespace }}
+spec:
+  host: {{ .Values.services.payment.serviceHost }}
+  trafficPolicy:
+    loadBalancer:
+      simple: {{ .Values.services.payment.loadBalancer }}
+  subsets:
+    - name: {{ .Values.services.payment.subset }}
+      labels:
+        version: {{ .Values.services.payment.versionLabel }}
+{{- end }}

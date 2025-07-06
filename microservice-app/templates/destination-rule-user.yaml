@@ -1,0 +1,16 @@
+{{- if .Values.services.user.enabled }}
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: user-destination-rule
+  namespace: {{ .Values.global.apiNamespace }}
+spec:
+  host: {{ .Values.services.user.serviceHost }}
+  trafficPolicy:
+    loadBalancer:
+      simple: {{ .Values.services.user.loadBalancer }}
+  subsets:
+    - name: {{ .Values.services.user.subset }}
+      labels:
+        version: {{ .Values.services.user.versionLabel }}
+{{- end }}
