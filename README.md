@@ -151,7 +151,7 @@ Below are example API calls with their expected outputs, as shown in the provide
 
 Istio provides robust observability through integration with **Kiali**, **Prometheus**, and **Jaeger**. The Kiali console visualizes service-to-service communication and interactions with MongoDB in the `mongo` namespace, offering insights into traffic flow and dependencies.
 
-![Kiali Console Output](https://github.com/user-attachments/assets/03349aa4-cf31-4d07-a378-94fd4e7a36c7)
+![image](https://github.com/user-attachments/assets/f37f5bbd-6343-4b10-bd93-fa9a6ad72e07)
 
 - **Traffic Management** 🚦: Uses `VirtualService` and `DestinationRule` for intelligent routing and load balancing.
 - **Observability** 📊: Monitors metrics, logs, and traces via Kiali, Prometheus, or Jaeger.
@@ -163,6 +163,10 @@ Istio provides robust observability through integration with **Kiali**, **Promet
 - **Istio Configurations** 🌐: Customize `VirtualService` or `DestinationRule` for advanced routing.
 - **MongoDB** 🗄️: Update connection strings in `values.yaml` for production databases.
 
-## 🛡️ Troubleshooting
+## 📜 License
 
-- **kubectl Issues** ❗: Ensure `kubectl` is installed and configured (`kubectlsome text has been truncated
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## 🎯 Conclusion
+
+The **Microservice Application** demonstrates a robust, scalable, and secure cloud-native architecture, leveraging **FastAPI**, **Docker**, **Kubernetes**, **Helm**, and **Istio**. With automated deployment via `deployment.sh`, seamless service interactions, and powerful observability through Kiali, this project serves as an excellent foundation for building and deploying microservices. The included API examples and visualizations (via Kiali) showcase its functionality, making it ideal for developers exploring modern microservice patterns or deploying production-ready systems. Contributions and feedback are encouraged to further enhance this project! 🚀
