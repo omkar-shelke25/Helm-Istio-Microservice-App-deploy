@@ -1,5 +1,8 @@
 name: Helm Chart Release
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -26,29 +29,25 @@ jobs:
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
-      - name: Create repo directory if missing
-        run: mkdir -p repo
-
-      - name: Move new packages to repo/
+      - name: Package Helm Chart
         run: |
-          cp fastapi-microservice-app-*.tgz repo/
+          helm package microservice-app
 
-      - name: Update index.yaml
+      - name: Update index.yaml in root
         run: |
-          helm repo index repo --url https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy \
+          helm repo index . \
+            --url https://omkar-shelke25.github.io/Helm-Istio-Microservice-App-deploy \
             --merge index.yaml
-          cp repo/index.yaml .
 
-      - name: Commit and Push Helm chart + index.yaml
+      - name: Commit and Push updated index.yaml and chart
         run: |
-          git add index.yaml
-          git add *.tgz
-          git commit -m "📦 Helm chart release: automated update"
-          git push origin main
+          git add index.yaml *.tgz
+          git commit -m "📦 Helm chart release: automated update" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GIT_TOKEN }}
+          personal_token: ${{ secrets.GIT_TOKEN }}
           publish_dir: .
           publish_branch: gh-pages
